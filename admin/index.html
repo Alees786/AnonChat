@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AnonChat Admin</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="admin.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<div id="admin-login" class="screen active">
+  <div class="verify-box">
+    <div class="logo-mark">⬡</div>
+    <h1>Admin Panel</h1>
+    <p class="tagline">AnonChat Administration</p>
+    <div id="step-phone" class="step active">
+      <label>Admin phone number</label>
+      <div class="phone-input-row">
+        <input type="text" id="country-code" value="+91" maxlength="4"/>
+        <input type="tel" id="phone-input" placeholder="9633716123" maxlength="10"/>
+      </div>
+      <div id="recaptcha-container"></div>
+      <button class="btn-primary" onclick="sendOTP()">Send OTP</button>
+    </div>
+    <div id="step-otp" class="step">
+      <label>Enter OTP</label>
+      <div class="otp-row">
+        <input type="number" class="otp-digit" maxlength="1"/>
+        <input type="number" class="otp-digit" maxlength="1"/>
+        <input type="number" class="otp-digit" maxlength="1"/>
+        <input type="number" class="otp-digit" maxlength="1"/>
+        <input type="number" class="otp-digit" maxlength="1"/>
+        <input type="number" class="otp-digit" maxlength="1"/>
+      </div>
+      <button class="btn-primary" onclick="verifyOTP()">Verify</button>
+      <button class="btn-ghost" onclick="backToPhone()">← Back</button>
+    </div>
+    <div id="step-loading" class="step">
+      <div class="spinner"></div><p>Verifying...</p>
+    </div>
+    <div id="step-denied" class="step">
+      <p style="color:var(--accent2)">⛔ Not an admin account.</p>
+      <button class="btn-ghost" onclick="backToPhone()">Try again</button>
+    </div>
+  </div>
+</div>
+
+<div id="admin-panel" class="screen">
+  <div class="admin-layout">
+
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <span class="logo-sm" style="color:var(--accent2)">⬡ Admin</span>
+        <button class="btn-icon danger" onclick="auth.signOut().then(()=>location.reload())" title="Sign out">⏻</button>
+      </div>
+      <nav class="admin-nav">
+        <button class="nav-btn active" onclick="showTab('messages')">💬 Messages</button>
+        <button class="nav-btn" onclick="showTab('users')">👥 Users</button>
+        <button class="nav-btn" onclick="showTab('settings')">⚙ Settings</button>
+      </nav>
+    </aside>
+
+    <main class="admin-main">
+
+      <!-- Messages Tab -->
+      <div id="tab-messages" class="admin-tab active">
+        <div class="tab-header">
+          <h2>All Messages</h2>
+          <div class="tab-controls">
+            <select id="room-filter" onchange="loadAdminMessages()">
+              <option value="general">Room: general</option>
+              <option value="random">Room: random</option>
+            </select>
+            <input type="text" id="msg-search" placeholder="Search..." oninput="filterMessages()"/>
+          </div>
+        </div>
+        <div id="admin-messages" class="admin-list"></div>
+      </div>
+
+      <!-- Users Tab -->
+      <div id="tab-users" class="admin-tab">
+        <div class="tab-header"><h2>All Users</h2></div>
+        <div id="admin-users" class="admin-list"></div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div id="tab-settings" class="admin-tab">
+        <div class="tab-header"><h2>App Settings</h2></div>
+        <div class="settings-grid">
+          <div class="setting-card">
+            <div class="setting-info">
+              <h3>Group Chat</h3>
+              <p>Allow users to send messages in public rooms</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="toggle-group" onchange="updateSetting('groupChat', this.checked)"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-card">
+            <div class="setting-info">
+              <h3>Direct Messages</h3>
+              <p>Allow users to send private DMs to each other</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="toggle-dm" onchange="updateSetting('dmChat', this.checked)"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-card">
+            <div class="setting-info">
+              <h3>Image Sharing</h3>
+              <p>Allow users to share images in chat</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="toggle-images" onchange="updateSetting('imageSharing', this.checked)"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-card">
+            <div class="setting-info">
+              <h3>Voice Messages</h3>
+              <p>Allow users to send voice recordings</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="toggle-voice" onchange="updateSetting('voiceMessages', this.checked)"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
